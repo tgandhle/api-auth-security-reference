@@ -2,7 +2,7 @@
 
 Two interactive, single-file HTML reference guides covering API security and authentication/authorization protocols, with a focus on how these controls apply to AI systems, LLM endpoints, and agentic pipelines.
 
-**[Live demo →](API Security in the AI Era](https://tgandhle.github.io/api-auth-security-reference/api-security-ai-era.html) · [Auth Protocols Guide](https://tgandhle.github.io/api-auth-security-reference/auth-protocols-guide.html)** 
+**Live demos:** [API Security in the AI Era](https://tgandhle.github.io/api-auth-security-reference/api-security-ai-era.html) · [Auth Protocols Guide](https://tgandhle.github.io/api-auth-security-reference/auth-protocols-guide.html) 
 
 ## What's here
 
