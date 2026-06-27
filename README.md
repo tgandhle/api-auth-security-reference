@@ -11,7 +11,7 @@ Two interactive, single-file HTML reference guides covering API security and aut
 | `auth-protocols-guide.html` | AuthN vs AuthZ across 8 protocols: OAuth 2.0 + PKCE, OpenID Connect, SAML 2.0, Client Credentials, mTLS, DPoP, FAPI 2.0, and the deprecated Implicit flow. Each with flow diagrams, a fact breakdown, and a verdict. Includes a protocol comparison matrix. |
 | `api-security-ai-era.html` | 9 control domains and 34 controls: auth mechanisms, JWT attack surface, gateway enforcement, rate limiting, webhooks, CORS, AI-specific threats, and versioning. Includes an interactive 20-point security review checklist. |
 
-Both files are self-contained. No build step, no dependencies, no framework. Open the HTML in a browser and it works.
+Both files are static single-page HTML references. No build step, framework, or runtime application dependency is required. The pages load Google Fonts from Google's CDN, with system-font fallbacks if that fails; remove the `<link>` in each file's `<head>` if you need strict offline behavior.
 
 ## Why I built it
 
