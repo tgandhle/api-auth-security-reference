@@ -2,7 +2,7 @@
 
 Two interactive, single-file HTML reference guides covering API security and authentication/authorization protocols, with a focus on how these controls apply to AI systems, LLM endpoints, and agentic pipelines.
 
-**[Live demo →](#)** *(replace with your GitHub Pages URL once published)*
+**[Live demo →](https://github.com/tgandhle/api-auth-security-reference)** 
 
 ## What's here
 
