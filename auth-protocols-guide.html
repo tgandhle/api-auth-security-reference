@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auth Protocols — AI Era</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --border: #1e2229;
+    --border-bright: #2d3340;
+    --text: #e2e6ed;
+    --muted: #6b7585;
+    --dim: #3a4050;
+
+    --authn: #00d4aa;
+    --authz: #4d9fff;
+    --both: #a78bfa;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --neutral: #6b7585;
+
+    --authn-bg: rgba(0,212,170,0.06);
+    --authz-bg: rgba(77,159,255,0.06);
+    --both-bg: rgba(167,139,250,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    padding: 48px 40px 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(77,159,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: 10%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,212,170,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  h1 span.blue { color: var(--authz); }
+  h1 span.green { color: var(--authn); }
+
+  .header-desc {
+    color: var(--muted);
+    max-width: 680px;
+    font-size: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* CONCEPT STRIP */
+  .concept-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .concept-card {
+    padding: 28px 32px;
+    border-right: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .concept-card:last-child { border-right: none; }
+  .concept-card:hover { background: rgba(255,255,255,0.02); }
+
+  .concept-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .tag-authn { color: var(--authn); background: var(--authn-bg); border: 1px solid rgba(0,212,170,0.2); }
+  .tag-authz { color: var(--authz); background: var(--authz-bg); border: 1px solid rgba(77,159,255,0.2); }
+  .tag-both  { color: var(--both);  background: var(--both-bg);  border: 1px solid rgba(167,139,250,0.2); }
+
+  .concept-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .concept-card p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .concept-card .question {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .concept-card.authn .question { color: var(--authn); }
+  .concept-card.authz .question { color: var(--authz); }
+  .concept-card.both  .question { color: var(--both); }
+
+  /* FILTER BAR */
+  .filter-bar {
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+
+  .filter-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border-bright);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .filter-btn:hover { border-color: var(--dim); color: var(--text); }
+  .filter-btn.active-all { border-color: var(--text); color: var(--text); background: rgba(255,255,255,0.04); }
+  .filter-btn.active-authn { border-color: var(--authn); color: var(--authn); background: var(--authn-bg); }
+  .filter-btn.active-authz { border-color: var(--authz); color: var(--authz); background: var(--authz-bg); }
+  .filter-btn.active-both  { border-color: var(--both);  color: var(--both);  background: var(--both-bg); }
+  .filter-btn.active-deprecated { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.06); }
+
+  /* MAIN GRID */
+  .protocols-grid {
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* PROTOCOL CARD */
+  .protocol-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    animation: fadeIn 0.3s ease both;
+  }
+  .protocol-card:hover { border-color: var(--border-bright); }
+  .protocol-card.hidden { display: none; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .protocol-card.authn-card { border-left: 3px solid var(--authn); }
+  .protocol-card.authz-card { border-left: 3px solid var(--authz); }
+  .protocol-card.both-card  { border-left: 3px solid var(--both); }
+  .protocol-card.deprecated-card { border-left: 3px solid var(--danger); opacity: 0.75; }
+
+  /* CARD HEADER */
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    cursor: pointer;
+    background: var(--surface);
+    user-select: none;
+    gap: 16px;
+  }
+  .card-header:hover { background: #13161c; }
+
+  .card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+  }
+
+  .card-title-group h2 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .card-subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-authn { color: var(--authn); background: var(--authn-bg); border: 1px solid rgba(0,212,170,0.25); }
+  .badge-authz { color: var(--authz); background: var(--authz-bg); border: 1px solid rgba(77,159,255,0.25); }
+  .badge-both  { color: var(--both);  background: var(--both-bg);  border: 1px solid rgba(167,139,250,0.25); }
+  .badge-deprecated { color: var(--danger); background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25); }
+  .badge-standard { color: var(--muted); background: transparent; border: 1px solid var(--border-bright); }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 14px;
+    transition: transform 0.2s;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .protocol-card.open .chevron { transform: rotate(180deg); }
+
+  /* CARD BODY */
+  .card-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .protocol-card.open .card-body { display: block; }
+
+  .card-body-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  /* FLOW PANEL */
+  .flow-panel {
+    padding: 24px;
+    border-right: 1px solid var(--border);
+  }
+
+  .panel-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .flow-step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    min-width: 20px;
+    padding-top: 2px;
+  }
+
+  .step-actors {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  .actor {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .actor-client  { color: var(--authz); background: rgba(77,159,255,0.1); }
+  .actor-server  { color: var(--authn); background: rgba(0,212,170,0.1); }
+  .actor-user    { color: var(--both);  background: rgba(167,139,250,0.1); }
+  .actor-api     { color: var(--warn);  background: rgba(245,158,11,0.1); }
+  .actor-neutral { color: var(--muted); background: rgba(107,117,133,0.1); }
+
+  .step-arrow {
+    color: var(--dim);
+    font-size: 12px;
+  }
+
+  .step-action {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  /* FACTS PANEL */
+  .facts-panel {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .fact-group h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .fact-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fact-item {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .fact-icon {
+    font-size: 12px;
+    padding-top: 1px;
+    flex-shrink: 0;
+    width: 16px;
+  }
+
+  .fact-item.good .fact-icon { color: var(--authn); }
+  .fact-item.warn .fact-icon { color: var(--warn); }
+  .fact-item.bad  .fact-icon { color: var(--danger); }
+  .fact-item.info .fact-icon { color: var(--authz); }
+
+  .fact-item span {
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* DISTINCTION CALLOUT */
+  .distinction-box {
+    margin: 0 24px 24px;
+    padding: 14px 18px;
+    border-radius: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    border: 1px solid;
+  }
+  .distinction-box.authn { background: var(--authn-bg); border-color: rgba(0,212,170,0.2); }
+  .distinction-box.authz { background: var(--authz-bg); border-color: rgba(77,159,255,0.2); }
+  .distinction-box.both  { background: var(--both-bg);  border-color: rgba(167,139,250,0.2); }
+  .distinction-box.deprecated { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+
+  .distinction-box .db-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .distinction-box.authn .db-label { color: var(--authn); }
+  .distinction-box.authz .db-label { color: var(--authz); }
+  .distinction-box.both  .db-label { color: var(--both); }
+  .distinction-box.deprecated .db-label { color: var(--danger); }
+  .distinction-box p { color: var(--muted); }
+
+  /* COMPARISON TABLE */
+  .comparison-section {
+    padding: 0 40px 48px;
+  }
+
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .comparison-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .comparison-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  .comparison-table tr:hover td { background: rgba(255,255,255,0.015); }
+  .comparison-table td:first-child { color: var(--text); font-weight: 500; }
+
+  .dot-authn { color: var(--authn); }
+  .dot-authz { color: var(--authz); }
+  .dot-both  { color: var(--both); }
+  .dot-no    { color: var(--danger); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    header { padding: 32px 20px 24px; }
+    .concept-strip { grid-template-columns: 1fr; }
+    .concept-card { border-right: none; border-bottom: 1px solid var(--border); }
+    .filter-bar { padding: 16px 20px; }
+    .protocols-grid { padding: 20px; }
+    .card-body-inner { grid-template-columns: 1fr; }
+    .flow-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    .comparison-section { padding: 0 20px 40px; }
+    .card-header { padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">// Reference Guide · Auth Protocols · AI Era</div>
+  <h1><span class="blue">AuthZ</span> vs <span class="green">AuthN</span><br>A Complete Protocol Reference</h1>
+  <p class="header-desc">
+    AuthN = who are you &nbsp;|&nbsp; AuthZ = what are you allowed to do<br>
+    Most protocols do one. A few do both. None of them are interchangeable.
+  </p>
+</header>
+
+<!-- CONCEPT STRIP -->
+<div class="concept-strip">
+  <div class="concept-card authn">
+    <div class="concept-tag tag-authn">Authentication · AuthN</div>
+    <div class="question">"Who are you?"</div>
+    <p>Verifies identity. Establishes that the caller is who they claim to be. Produces a credential (token, assertion, cert) that downstream systems can trust. Does not say anything about what the caller can do.</p>
+  </div>
+  <div class="concept-card authz">
+    <div class="concept-tag tag-authz">Authorization · AuthZ</div>
+    <div class="question">"What can you do?"</div>
+    <p>Controls access. Given a verified identity (or just a token), determines what resources and operations are permitted. OAuth 2.0 is pure authZ — it grants scoped access without caring who the user is.</p>
+  </div>
+  <div class="concept-card both">
+    <div class="concept-tag tag-both">Both Together</div>
+    <div class="question">"Who + what?"</div>
+    <p>Full stack identity. Some protocols layer authN on top of an authZ foundation. OpenID Connect does this over OAuth 2.0. SAML bundles both in one assertion. Most real-world systems need both.</p>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active-all" onclick="filterCards('all', this)">All</button>
+  <button class="filter-btn" onclick="filterCards('authn', this)">AuthN Only</button>
+  <button class="filter-btn" onclick="filterCards('authz', this)">AuthZ Only</button>
+  <button class="filter-btn" onclick="filterCards('both', this)">Both</button>
+  <button class="filter-btn" onclick="filterCards('deprecated', this)">Deprecated</button>
+</div>
+
+<!-- PROTOCOLS GRID -->
+<div class="protocols-grid">
+
+  <!-- OAuth 2.0 + PKCE -->
+  <div class="protocol-card authz-card" data-type="authz" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>OAuth 2.0 + PKCE</h2>
+          <div class="card-subtitle">RFC 6749 + RFC 7636 · Delegated Authorization</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-authz">AuthZ Only</span>
+        <span class="badge badge-standard">Baseline Standard</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">Authorization Code + PKCE Flow</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-user">User/Browser</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">App (Client)</span>
+              </div>
+              <div class="step-action">login request</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-client">App (Client)</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">redirect + code_challenge</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">App (Client)</span>
+              </div>
+              <div class="step-action">auth code</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-client">App (Client)</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">code + verifier</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">App (Client)</span>
+              </div>
+              <div class="step-action">access token (bearer)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">06</div>
+              <div class="step-actors">
+                <span class="actor actor-client">App (Client)</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-api">Resource API</span>
+              </div>
+              <div class="step-action">bearer token</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it does</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>Grants a client app scoped access to a resource on behalf of a user — without the user sharing their password with the app.</span></div>
+              <div class="fact-item info"><span class="fact-icon">→</span><span>PKCE adds a one-time code verifier, preventing auth code interception. Required for public clients (SPAs, mobile).</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AuthN vs AuthZ</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Pure AuthZ. OAuth 2.0 alone does NOT authenticate the user. You get a token scoped to permissions — not identity proof. Add OIDC if you need identity.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Standard for user-facing AI apps (ChatGPT, Copilot, Claude.ai). Used wherever users delegate access to a service.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Not designed for agent-to-agent flows where there is no user present.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Tokens are bearer tokens — stolen token = access. No built-in proof of sender. Mitigate with DPoP or mTLS binding.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box authz">
+        <div class="db-label">AuthZ Verdict</div>
+        <p>OAuth 2.0 grants permissions, not identity. If your system needs to know "who is this user," layer OpenID Connect on top. Using OAuth alone and treating the access token as identity proof is a common and dangerous mistake.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OpenID Connect -->
+  <div class="protocol-card both-card" data-type="both" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>OpenID Connect 1.0</h2>
+          <div class="card-subtitle">Built on OAuth 2.0 · Authentication + Authorization</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-both">AuthN + AuthZ</span>
+        <span class="badge badge-standard">Required for Identity</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">OIDC Flow (Adds ID Token Layer)</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-user">User</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">App (Relying Party)</span>
+              </div>
+              <div class="step-action">login</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-client">App</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">IdP / Auth Server</span>
+              </div>
+              <div class="step-action">OIDC auth request</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-server">IdP</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">App</span>
+              </div>
+              <div class="step-action">ID Token + Access Token</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-client">App</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-api">Resource / API</span>
+              </div>
+              <div class="step-action">validate JWT / claims</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-api">UserInfo Endpoint</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">App</span>
+              </div>
+              <div class="step-action">sub, email, roles</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it adds over OAuth 2.0</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>An ID Token (JWT) that proves who the user is — not just what they're allowed to do. This is the critical distinction.</span></div>
+              <div class="fact-item info"><span class="fact-icon">→</span><span>The ID token contains claims: sub (user ID), email, name, roles, session info. Signed by the IdP.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AuthN vs AuthZ</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Does both. ID Token = AuthN (who you are). Access Token = AuthZ (what you can do). Two tokens, two jobs.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Required when an AI system needs to assert user identity downstream — passing user context to LLMs, audit logging, or role-based access inside AI apps.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Used by: Okta, Entra ID, Google, Salesforce Einstein, Microsoft Copilot stack.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>ID token is proof of auth at issuance, not continuous verification. Access token is still bearer-based without DPoP/mTLS binding.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box both">
+        <div class="db-label">AuthN + AuthZ Verdict</div>
+        <p>OIDC is the correct choice when you need both "who is this" and "what can they do." OAuth 2.0 alone gets you the second question only. If you're building AI workflows that need to log or act on behalf of a specific user, OIDC is the minimum viable standard.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAML 2.0 -->
+  <div class="protocol-card both-card" data-type="both" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>SAML 2.0</h2>
+          <div class="card-subtitle">OASIS Standard · Enterprise SSO / Browser Federation</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-both">AuthN + AuthZ</span>
+        <span class="badge badge-standard">Enterprise SSO Only</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">SP-Initiated SSO Flow</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-user">User/Browser</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Service Provider (SP)</span>
+              </div>
+              <div class="step-action">access protected resource</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-client">SP</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Identity Provider (IdP)</span>
+              </div>
+              <div class="step-action">redirect + SAMLRequest (XML)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-server">IdP</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-user">Browser</span>
+              </div>
+              <div class="step-action">authenticate user</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-user">Browser</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">SP</span>
+              </div>
+              <div class="step-action">POST SAMLResponse (signed XML)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-client">SP</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-user">Browser</span>
+              </div>
+              <div class="step-action">session granted</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it does</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>Browser-mediated SSO using signed XML assertions. The IdP vouches for the user to the SP via the browser as a relay.</span></div>
+              <div class="fact-item info"><span class="fact-icon">→</span><span>The assertion contains both identity (who) and attributes (roles, groups) — so it covers both AuthN and limited AuthZ.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AuthN vs AuthZ</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>AuthN: signed XML assertion proves identity at the IdP. AuthZ: attribute statements carry roles/permissions the SP can use for access control.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Acceptable for enterprise AI SaaS login (user SSO into Copilot, Einstein, etc.) where browser federation is the entry point.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Not a practical choice for API-level or agent calls — it is browser-bound by design. A non-browser profile (ECP) exists but is rare and not worth adopting for new work.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>XML complexity creates real attack surface: XXE injection, signature wrapping attacks. Mature but not simple.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>No modern API use case for new builds. Do not use for M2M or agent flows.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box both">
+        <div class="db-label">AuthN + AuthZ Verdict</div>
+        <p>SAML handles both AuthN and AuthZ through a single signed assertion, but it's architecturally browser-bound. It's mature and widely supported in enterprise IdPs. Use it for SSO login flows only. Never for programmatic or agentic access.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Credentials -->
+  <div class="protocol-card authz-card" data-type="authz" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>OAuth 2.0 — Client Credentials</h2>
+          <div class="card-subtitle">RFC 6749 §4.4 · Machine-to-Machine Authorization</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-authz">AuthZ Only</span>
+        <span class="badge badge-standard">M2M Standard</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">Client Credentials Flow</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Service / Agent</span>
+              </div>
+              <div class="step-action">has client_id + client_secret</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Service</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">POST credentials + scope</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Service</span>
+              </div>
+              <div class="step-action">access token</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Service</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-api">Resource API</span>
+              </div>
+              <div class="step-action">bearer token in request</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-api">Resource API</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Service</span>
+              </div>
+              <div class="step-action">200 OK</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it does</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>No user involved. The service authenticates as itself using its own credentials and gets a scoped access token for M2M calls.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AuthN vs AuthZ</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Mostly AuthZ. The service presents a credential (which is a weak form of AuthN), but the output is a bearer token scoped to permissions — not an identity assertion.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>The go-to flow for agent-to-service calls, LLM orchestration, and automated pipelines with no user in the loop.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Combine with mTLS for sender-constrained tokens in high-security agent pipelines.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Secret management is the hard part. client_secret must be stored in a secrets vault (CyberArk, AWS Secrets Manager), never in config files or environment variables.</span></div>
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Still bearer token. Stolen token = access. Pair with short TTLs and IP allowlisting where possible.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box authz">
+        <div class="db-label">AuthZ Verdict</div>
+        <p>Client Credentials is the correct OAuth flow for M2M. No user, no browser, no redirect. The service authenticates itself and gets scoped access. The weak link is the secret — secure its storage and rotation or this flow's security collapses.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- mTLS -->
+  <div class="protocol-card authn-card" data-type="authn" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>mTLS — Mutual TLS</h2>
+          <div class="card-subtitle">RFC 8705 · Service-to-Service / Agent-to-Agent</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-authn">AuthN Primary</span>
+        <span class="badge badge-standard">Best for M2M</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">mTLS Handshake + OAuth Token Binding</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Agent / Service A</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Agent / Service B</span>
+              </div>
+              <div class="step-action">client cert (TLS handshake)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Service B</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Service A</span>
+              </div>
+              <div class="step-action">server cert (TLS handshake)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-neutral">Both sides verified</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">cert-bound token request</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Service A</span>
+              </div>
+              <div class="step-action">token bound to cert thumbprint</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Service A</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-api">Resource API</span>
+              </div>
+              <div class="step-action">bound token + cert</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it does</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>Both client and server present certificates. Verifies identity at the transport layer, not just the application layer. Token is bound to the cert — stolen token alone is useless.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AuthN vs AuthZ</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Strong AuthN at the transport layer via PKI certs. When combined with OAuth, the token binding makes it sender-constrained, adding AuthZ scope.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Correct for MCP server auth, LLM orchestration service calls, agentic pipeline inter-service calls.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Used in FAPI 2.0 and open banking mandates. Eliminates bearer token theft risk at the transport layer.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Cert lifecycle management is operationally heavy. Requires PKI infrastructure. Not suited for user-facing browser flows.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box authn">
+        <div class="db-label">AuthN Verdict</div>
+        <p>mTLS is the strongest available AuthN mechanism for M2M. It proves identity at the transport layer and the bound token proves the caller still holds the cert at request time. The cost is PKI complexity — you need a CA, cert issuance, rotation, and revocation infrastructure. For high-value agent pipelines, that cost is justified.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DPoP -->
+  <div class="protocol-card authz-card" data-type="authz" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>DPoP — Proof of Possession</h2>
+          <div class="card-subtitle">RFC 9449 · Token Binding Without mTLS</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-authz">AuthZ + Binding</span>
+        <span class="badge badge-standard">Emerging Best Practice</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">DPoP Flow</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Client / Agent</span>
+              </div>
+              <div class="step-action">generate ephemeral keypair</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Client</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">token request + DPoP proof JWT</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Client</span>
+              </div>
+              <div class="step-action">token bound to public key</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Client</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-api">Resource API</span>
+              </div>
+              <div class="step-action">token + fresh DPoP proof</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-api">API</span>
+              </div>
+              <div class="step-action">verify proof matches token → granted</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it does</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>Binds an access token to a client's private key. Every request requires a fresh signed proof — token alone is worthless without the key.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>vs mTLS</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>DPoP works at the application layer — no cert infrastructure needed. Lighter to implement but slightly weaker than mTLS cert binding. No PKI required.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>High value in agentic pipelines where bearer tokens pass through multiple hops. A compromised agent in the middle can't replay a stolen token.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Not yet universally supported by all API servers. Nonce replay protection is commonly implemented with server-side state, though stateless designs (signed or encrypted nonces) are possible. Either way it adds complexity.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box authz">
+        <div class="db-label">AuthZ + Token Binding Verdict</div>
+        <p>DPoP is the practical middle ground between bare bearer tokens (weak) and full mTLS (operationally heavy). It gives you sender-constrained tokens without a PKI. If your environment can't do mTLS, DPoP is the right upgrade from vanilla bearer tokens.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAPI 2.0 -->
+  <div class="protocol-card both-card" data-type="both" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>FAPI 2.0</h2>
+          <div class="card-subtitle">Financial-Grade API Profile · High-Assurance OAuth</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-both">AuthN + AuthZ</span>
+        <span class="badge badge-standard">Regulated Data / Healthcare</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">FAPI 2.0 = OAuth 2.1 + PAR + mTLS/DPoP</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Client</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">PAR: push auth request (back-channel)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Client</span>
+              </div>
+              <div class="step-action">request_uri (short-lived ref)</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Client</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">redirect with request_uri only</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">04</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-client">Client</span>
+              </div>
+              <div class="step-action">mTLS or DPoP bound token</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">05</div>
+              <div class="step-actors">
+                <span class="actor actor-client">Client</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-api">Protected Resource</span>
+              </div>
+              <div class="step-action">bound token + proof</div>
+            </div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Key Facts</div>
+          <div class="fact-group">
+            <h4>What it is</h4>
+            <div class="fact-items">
+              <div class="fact-item info"><span class="fact-icon">→</span><span>A security profile layered on top of OAuth 2.1. It mandates PAR, mTLS or DPoP, and short-lived tokens. Not a new protocol — a stricter ruleset.</span></div>
+              <div class="fact-item info"><span class="fact-icon">→</span><span>PAR (Pushed Auth Requests): auth parameters sent back-channel first, so they never appear in the browser URL. Prevents parameter tampering.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AuthN vs AuthZ</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Strong AuthN through mandatory mTLS or DPoP. Strong AuthZ through sender-constrained scoped tokens. Both are enforced, not optional.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>AI Relevance</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Required for AI systems touching PHI, financial data, or regulated PII. Applies directly to healthcare and fintech contexts.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Limitations</h4>
+            <div class="fact-items">
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>Significant implementation overhead. Most AI SaaS vendors do not support it natively — requires gateway or proxy enforcement.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box both">
+        <div class="db-label">AuthN + AuthZ Verdict</div>
+        <p>FAPI 2.0 is what you mandate when the data is sensitive enough that you can't accept weak AuthN or plain bearer tokens. It's the appropriate standard for AI systems handling financial data, health records, or regulated PII. The trade-off is implementation complexity — most vendors need a gateway in front to enforce it.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Implicit Flow (Deprecated) -->
+  <div class="protocol-card deprecated-card" data-type="deprecated" onclick="toggleCard(this)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-group">
+          <h2>OAuth 2.0 Implicit Flow</h2>
+          <div class="card-subtitle">RFC 6749 §4.2 · DEPRECATED — Do Not Use</div>
+        </div>
+      </div>
+      <div class="card-header-right">
+        <span class="badge badge-deprecated">Deprecated</span>
+        <span class="badge badge-standard">Legacy Only</span>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="flow-panel">
+          <div class="panel-label">Why It Fails</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="step-num">01</div>
+              <div class="step-actors">
+                <span class="actor actor-user">User/Browser</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-server">Auth Server</span>
+              </div>
+              <div class="step-action">login request</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">02</div>
+              <div class="step-actors">
+                <span class="actor actor-server">Auth Server</span>
+                <span class="step-arrow">→</span>
+                <span class="actor actor-user">Browser</span>
+              </div>
+              <div class="step-action">⚠ token in URL fragment</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">03</div>
+              <div class="step-actors">
+                <span class="actor actor-neutral">Token exposed in:</span>
+              </div>
+              <div class="step-action">browser history, server logs, referrer headers</div>
+            </div>
+          </div>
+          <div style="margin-top:20px; padding: 14px; background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius:5px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--danger); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">Detection Signal</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted);">If you see <span style="color:var(--text);">response_type=token</span> in an OAuth flow, that's implicit. Flag it immediately. Replace with authorization code + PKCE.</div>
+          </div>
+        </div>
+        <div class="facts-panel">
+          <div class="panel-label">Why It Was Replaced</div>
+          <div class="fact-group">
+            <h4>Core Failures</h4>
+            <div class="fact-items">
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Access token returned in the URL fragment. Leaks via browser history, referrer headers, and proxy logs.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>No PKCE equivalent. No way to verify the recipient is the intended client. Auth code + PKCE solves this.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Still in the wild. Older AI SaaS integrations still use it. If you see response_type=token, flag it.</span></div>
+            </div>
+          </div>
+          <div class="fact-group">
+            <h4>Replace With</h4>
+            <div class="fact-items">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>OAuth 2.0 Authorization Code + PKCE. Drop-in replacement for SPAs and mobile apps. No server-side component required.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="distinction-box deprecated">
+        <div class="db-label">Deprecated Verdict</div>
+        <p>There is no valid reason to use the implicit flow in a new integration. It was deprecated because it cannot be made secure. If a vendor's documentation still shows response_type=token, their auth implementation is outdated. Require them to support authorization code + PKCE.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="comparison-section">
+  <div class="section-title">// Protocol Comparison Matrix</div>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Protocol</th>
+        <th>AuthN</th>
+        <th>AuthZ</th>
+        <th>User Present</th>
+        <th>M2M / Agent</th>
+        <th>Token Binding</th>
+        <th>Browser Required</th>
+        <th>Use In AI Systems</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>OAuth 2.0 + PKCE</td>
+        <td><span class="dot-no">✗</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td>None (bearer)</td>
+        <td><span class="dot-authz">✓</span></td>
+        <td>User-facing AI apps</td>
+      </tr>
+      <tr>
+        <td>OpenID Connect 1.0</td>
+        <td><span class="dot-authn">✓</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td>None (bearer)</td>
+        <td><span class="dot-authz">✓</span></td>
+        <td>Identity-aware AI, audit, RBAC</td>
+      </tr>
+      <tr>
+        <td>SAML 2.0</td>
+        <td><span class="dot-authn">✓</span></td>
+        <td><span class="dot-authz">✓ (attrs)</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td>None</td>
+        <td><span class="dot-authz">✓ Required</span></td>
+        <td>Enterprise SSO login only</td>
+      </tr>
+      <tr>
+        <td>OAuth 2.0 Client Creds</td>
+        <td><span class="dot-no">Partial</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td><span class="dot-authn">✓</span></td>
+        <td>None (bearer)</td>
+        <td><span class="dot-no">✗</span></td>
+        <td>Agent-to-service, pipelines</td>
+      </tr>
+      <tr>
+        <td>mTLS</td>
+        <td><span class="dot-authn">✓ Strong</span></td>
+        <td><span class="dot-authz">✓ (bound)</span></td>
+        <td>Optional</td>
+        <td><span class="dot-authn">✓</span></td>
+        <td><span class="dot-authn">Cert-bound</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td>MCP, LLM orchestration, high-sec M2M</td>
+      </tr>
+      <tr>
+        <td>DPoP</td>
+        <td><span class="dot-no">✗</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td>Optional</td>
+        <td><span class="dot-authn">✓</span></td>
+        <td><span class="dot-authz">Key-bound</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td>Multi-hop agent pipelines</td>
+      </tr>
+      <tr>
+        <td>FAPI 2.0</td>
+        <td><span class="dot-authn">✓</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td>Optional</td>
+        <td><span class="dot-authn">✓</span></td>
+        <td><span class="dot-authn">mTLS or DPoP</span></td>
+        <td>Optional</td>
+        <td>PHI, financial data, regulated PII in AI</td>
+      </tr>
+      <tr>
+        <td>OAuth 2.0 Implicit</td>
+        <td><span class="dot-no">✗</span></td>
+        <td><span class="dot-no">✗ Broken</span></td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-no">✗</span></td>
+        <td>None</td>
+        <td><span class="dot-authz">✓</span></td>
+        <td><span class="dot-no">Do not use</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function toggleCard(card) {
+    // Don't collapse if clicking inside the body
+    if (event.target.closest('.card-body')) return;
+    card.classList.toggle('open');
+  }
+
+  function filterCards(type, btn) {
+    // Update button states
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.className = 'filter-btn';
+    });
+    btn.classList.add('active-' + type);
+
+    // Filter cards
+    document.querySelectorAll('.protocol-card').forEach(card => {
+      if (type === 'all') {
+        card.classList.remove('hidden');
+      } else {
+        const cardType = card.getAttribute('data-type');
+        if (cardType === type) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+          card.classList.remove('open');
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

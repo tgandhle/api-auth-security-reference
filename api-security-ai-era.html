@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Security — AI Era</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --surface2: #eeece7;
+    --border: #ddd9d0;
+    --border-dark: #c8c3b8;
+    --text: #1a1814;
+    --muted: #7a7468;
+    --dim: #b0aa9e;
+
+    --red: #c0392b;
+    --orange: #d35400;
+    --green: #1a7a4a;
+    --blue: #1a4fa0;
+    --purple: #6b3fa0;
+    --yellow: #b8860b;
+
+    --red-bg: rgba(192,57,43,0.07);
+    --orange-bg: rgba(211,84,0,0.07);
+    --green-bg: rgba(26,122,74,0.07);
+    --blue-bg: rgba(26,79,160,0.07);
+    --purple-bg: rgba(107,63,160,0.07);
+    --yellow-bg: rgba(184,134,11,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--text);
+    color: var(--bg);
+    padding: 52px 48px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: 'API';
+    position: absolute;
+    right: -20px;
+    top: -30px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 220px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -0.05em;
+  }
+
+  .header-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(245,243,238,0.4);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.0;
+    margin-bottom: 20px;
+  }
+
+  h1 .accent { color: var(--red); }
+  h1 .accent2 { color: rgba(245,243,238,0.5); font-weight: 400; }
+
+  .header-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(245,243,238,0.45);
+    max-width: 620px;
+    line-height: 1.7;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-num {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--bg);
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(245,243,238,0.35);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* THREAT LEVEL STRIP */
+  .threat-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 2px solid var(--border-dark);
+  }
+
+  .threat-card {
+    padding: 24px 28px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    transition: background 0.15s;
+  }
+  .threat-card:last-child { border-right: none; }
+  .threat-card:hover { background: var(--surface2); }
+
+  .threat-level {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .level-critical { background: var(--red-bg); color: var(--red); border: 1px solid rgba(192,57,43,0.3); }
+  .level-high     { background: var(--orange-bg); color: var(--orange); border: 1px solid rgba(211,84,0,0.3); }
+  .level-medium   { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(184,134,11,0.3); }
+  .level-control  { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(26,79,160,0.3); }
+
+  .threat-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .threat-card p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 16px 20px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-weight: 500;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+  /* CONTENT SECTIONS */
+  .section {
+    display: none;
+    padding: 40px 48px;
+  }
+  .section.active { display: block; }
+
+  .section-header {
+    margin-bottom: 32px;
+  }
+
+  .section-header h2 {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .section-header p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 680px;
+    line-height: 1.7;
+  }
+
+  /* CONTROL CARDS */
+  .controls-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .control-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .control-card:hover { border-color: var(--border-dark); }
+
+  .control-card.critical { border-left: 4px solid var(--red); }
+  .control-card.high     { border-left: 4px solid var(--orange); }
+  .control-card.medium   { border-left: 4px solid var(--yellow); }
+  .control-card.info     { border-left: 4px solid var(--blue); }
+
+  .control-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    cursor: pointer;
+    gap: 16px;
+  }
+  .control-header:hover { background: var(--surface2); }
+
+  .control-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+  }
+
+  .control-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    min-width: 32px;
+  }
+
+  .control-title-group h3 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+
+  .control-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .control-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-critical { background: var(--red-bg);    color: var(--red);    border: 1px solid rgba(192,57,43,0.25); }
+  .badge-high     { background: var(--orange-bg);  color: var(--orange);  border: 1px solid rgba(211,84,0,0.25); }
+  .badge-medium   { background: var(--yellow-bg);  color: var(--yellow);  border: 1px solid rgba(184,134,11,0.25); }
+  .badge-info     { background: var(--blue-bg);    color: var(--blue);    border: 1px solid rgba(26,79,160,0.25); }
+  .badge-good     { background: var(--green-bg);   color: var(--green);   border: 1px solid rgba(26,122,74,0.25); }
+  .badge-ai       { background: var(--purple-bg);  color: var(--purple);  border: 1px solid rgba(107,63,160,0.25); }
+
+  .chevron {
+    font-size: 11px;
+    color: var(--dim);
+    transition: transform 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .control-card.open .chevron { transform: rotate(180deg); }
+
+  /* CONTROL BODY */
+  .control-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .control-card.open .control-body { display: block; }
+
+  .control-body-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .body-panel {
+    padding: 22px;
+  }
+  .body-panel:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .panel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  /* ATTACK FLOW */
+  .attack-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .attack-step {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .attack-step:last-child { border-bottom: none; }
+
+  .step-icon {
+    font-size: 13px;
+    min-width: 20px;
+    padding-top: 1px;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .step-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #1a1814;
+    color: #f5f3ee;
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    margin: 12px 0;
+    overflow-x: auto;
+  }
+  .code-block .comment { color: rgba(245,243,238,0.3); }
+  .code-block .key     { color: #7dd3fc; }
+  .code-block .val     { color: #86efac; }
+  .code-block .bad     { color: #fca5a5; }
+  .code-block .good    { color: #86efac; }
+  .code-block .warn    { color: #fde68a; }
+
+  /* FACT ITEMS */
+  .fact-group { margin-bottom: 18px; }
+  .fact-group h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .fact-items { display: flex; flex-direction: column; gap: 7px; }
+
+  .fact-item {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .fact-icon { font-size: 12px; padding-top: 1px; flex-shrink: 0; width: 16px; }
+  .fact-item.good .fact-icon { color: var(--green); }
+  .fact-item.bad  .fact-icon { color: var(--red); }
+  .fact-item.warn .fact-icon { color: var(--orange); }
+  .fact-item.info .fact-icon { color: var(--blue); }
+
+  .fact-item span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* VERDICT BOX */
+  .verdict-box {
+    margin: 0 22px 22px;
+    padding: 14px 18px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    border: 1px solid;
+  }
+  .verdict-box.critical { background: var(--red-bg);    border-color: rgba(192,57,43,0.25); }
+  .verdict-box.high     { background: var(--orange-bg);  border-color: rgba(211,84,0,0.25); }
+  .verdict-box.medium   { background: var(--yellow-bg);  border-color: rgba(184,134,11,0.25); }
+  .verdict-box.info     { background: var(--blue-bg);    border-color: rgba(26,79,160,0.25); }
+
+  .verdict-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .verdict-box.critical .verdict-label { color: var(--red); }
+  .verdict-box.high     .verdict-label { color: var(--orange); }
+  .verdict-box.medium   .verdict-label { color: var(--yellow); }
+  .verdict-box.info     .verdict-label { color: var(--blue); }
+  .verdict-box p { color: var(--muted); }
+
+  /* MATRIX TABLE */
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: var(--surface);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .matrix-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border-dark);
+    text-align: left;
+    font-weight: 500;
+    background: var(--surface2);
+  }
+
+  .matrix-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    vertical-align: top;
+  }
+  .matrix-table tr:last-child td { border-bottom: none; }
+  .matrix-table tr:hover td { background: var(--surface2); }
+  .matrix-table td:first-child { color: var(--text); font-weight: 600; font-size: 12px; }
+
+  .dot-yes  { color: var(--green); }
+  .dot-no   { color: var(--red); }
+  .dot-warn { color: var(--orange); }
+
+  /* CHECKLIST */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    cursor: pointer;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item:hover { background: var(--surface2); }
+  .checklist-item.checked { opacity: 0.5; }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-dark);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
+  }
+  .checklist-item.checked .check-box {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .check-content h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .check-content p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .check-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  /* TWO COL LAYOUT */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .col-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px;
+  }
+
+  .col-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 800px) {
+    header { padding: 32px 24px 28px; }
+    .threat-strip { grid-template-columns: 1fr 1fr; }
+    .nav-tabs { padding: 0 24px; }
+    .section { padding: 28px 24px; }
+    .control-body-inner { grid-template-columns: 1fr; }
+    .body-panel:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .two-col { grid-template-columns: 1fr; }
+    .header-stats { gap: 24px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-eyebrow">// Reference Guide · API Security · AI Era</div>
+  <h1>API Security<br><span class="accent">in the AI Era</span></h1>
+  <p class="header-desc">
+    Authentication mechanisms, gateway enforcement, JWT attack surface, rate limiting, webhook verification, CORS, and AI-specific API threats.<br>
+    Operational controls for architects and engineers.
+  </p>
+  <div class="header-stats">
+    <div class="stat"><div class="stat-num">9</div><div class="stat-label">Control Domains</div></div>
+    <div class="stat"><div class="stat-num">34</div><div class="stat-label">Controls</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">AI-Specific Threats</div></div>
+    <div class="stat"><div class="stat-num">OWASP API Top 10</div><div class="stat-label">Coverage Baseline</div></div>
+  </div>
+</header>
+
+<!-- THREAT STRIP -->
+<div class="threat-strip">
+  <div class="threat-card">
+    <div class="threat-level level-critical">Critical</div>
+    <h3>Broken Auth</h3>
+    <p>API keys in URLs, no rotation, implicit OAuth. A leading cause of API breaches (OWASP API2:2023).</p>
+  </div>
+  <div class="threat-card">
+    <div class="threat-level level-high">High</div>
+    <h3>JWT Attacks</h3>
+    <p>alg:none bypass, weak signing keys, missing claim validation. Trivial to exploit.</p>
+  </div>
+  <div class="threat-card">
+    <div class="threat-level level-high">High</div>
+    <h3>AI-Specific Threats</h3>
+    <p>Prompt injection via API, model endpoint abuse, token exfiltration through LLM responses.</p>
+  </div>
+  <div class="threat-card">
+    <div class="threat-level level-control">Control</div>
+    <h3>Gateway Enforcement</h3>
+    <p>Most controls fail because they live in app code, not the gateway. Fix the enforcement layer first.</p>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('authmech', this)">Auth Mechanisms</button>
+  <button class="nav-tab" onclick="switchTab('jwt', this)">JWT Security</button>
+  <button class="nav-tab" onclick="switchTab('gateway', this)">Gateway Controls</button>
+  <button class="nav-tab" onclick="switchTab('ratelimit', this)">Rate Limiting</button>
+  <button class="nav-tab" onclick="switchTab('webhook', this)">Webhooks</button>
+  <button class="nav-tab" onclick="switchTab('cors', this)">CORS</button>
+  <button class="nav-tab" onclick="switchTab('ai', this)">AI-Specific Threats</button>
+  <button class="nav-tab" onclick="switchTab('versioning', this)">Versioning</button>
+  <button class="nav-tab" onclick="switchTab('checklist', this)">Review Checklist</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: AUTH MECHANISMS -->
+<!-- ============================================================ -->
+<div id="tab-authmech" class="section active">
+  <div class="section-header">
+    <h2>API Authentication Mechanisms</h2>
+    <p>The method you use to prove who's calling the API. Each has a different threat profile, operational cost, and appropriate use case. Most APIs use more than one mechanism depending on the caller type.</p>
+  </div>
+
+  <div class="controls-grid">
+
+    <!-- API Keys -->
+    <div class="control-card critical" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>API Keys</h3>
+            <div class="control-subtitle">Static Shared Secrets · Most Common, Most Abused</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-critical">High Risk</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">How They Work + Where They Fail</div>
+            <div class="attack-flow">
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">→</div>
+                <div class="step-content">
+                  <div class="step-title">What they are</div>
+                  <div class="step-desc">A static string the client sends with every request. No expiry by default. No user context. Server looks it up in a table, grants or denies.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">✗</div>
+                <div class="step-content">
+                  <div class="step-title">Key in URL (Critical)</div>
+                  <div class="step-desc">GET /data?api_key=abc123 — logged in server logs, proxy logs, browser history, referrer headers. Treat as compromised immediately.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">✗</div>
+                <div class="step-content">
+                  <div class="step-title">Key in source code</div>
+                  <div class="step-desc">Committed to repos, leaked in build artifacts. GitHub searches for API keys return thousands of live credentials daily.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--orange)">!</div>
+                <div class="step-content">
+                  <div class="step-title">No rotation policy</div>
+                  <div class="step-desc">A key from 3 years ago is still valid. You have no idea who has it or if it's been shared.</div>
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+<span class="comment"># BAD — key in URL</span>
+GET /api/data?<span class="bad">api_key=sk_live_abc123</span>
+
+<span class="comment"># GOOD — key in header</span>
+GET /api/data
+<span class="key">Authorization</span>: <span class="val">ApiKey sk_live_abc123</span>
+<span class="comment"># or</span>
+<span class="key">X-API-Key</span>: <span class="val">sk_live_abc123</span>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Required Controls</div>
+            <div class="fact-group">
+              <h4>Mandatory</h4>
+              <div class="fact-items">
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Always in Authorization header or X-API-Key header. Never in URL query params.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Enforce a rotation policy. Recommended baseline: 90 days for production keys, 30 days for high-value integrations. Adjust to your risk tolerance.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Store in secrets vault only. CyberArk, AWS Secrets Manager, HashiCorp Vault. Never env vars in plaintext config.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Scope keys to minimum required permissions. A read-only key should not have write access.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Log and alert on key usage anomalies. Unusual volume, unusual source IPs, off-hours usage.</span></div>
+              </div>
+            </div>
+            <div class="fact-group">
+              <h4>AI Context</h4>
+              <div class="fact-items">
+                <div class="fact-item warn"><span class="fact-icon">!</span><span>LLM integrations often use API keys to call model endpoints (OpenAI, Anthropic, Azure OpenAI). These keys have high blast radius — treat them as secrets with elevated sensitivity.</span></div>
+                <div class="fact-item bad"><span class="fact-icon">✗</span><span>Never pass API keys in prompts or context. LLMs log input. Keys in prompts = keys in logs.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box critical">
+          <div class="verdict-label">Risk Verdict</div>
+          <p>API keys are the weakest auth mechanism and the most widely deployed. The risk is not the key itself — it's the operational controls around it. Without rotation, scoping, vault storage, and header-only transport, API keys are effectively public credentials waiting to be found.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HMAC -->
+    <div class="control-card high" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">02</div>
+          <div class="control-title-group">
+            <h3>HMAC Request Signing</h3>
+            <div class="control-subtitle">Hash-Based Message Authentication · Strong M2M Auth</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-good">Recommended</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">How HMAC Signing Works</div>
+            <div class="attack-flow">
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">01</div>
+                <div class="step-content">
+                  <div class="step-title">Build canonical request</div>
+                  <div class="step-desc">Method + path + timestamp + body hash + selected headers. Both sides must agree on exactly what gets signed.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">02</div>
+                <div class="step-content">
+                  <div class="step-title">Sign with shared secret</div>
+                  <div class="step-desc">HMAC-SHA256(canonical_string, secret_key). Produces a signature unique to this exact request at this exact time.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">03</div>
+                <div class="step-content">
+                  <div class="step-title">Server verifies</div>
+                  <div class="step-desc">Recomputes the same HMAC. If it matches, the request is authentic and untampered. Timestamp check prevents replay.</div>
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+<span class="key">Authorization</span>: <span class="val">HMAC-SHA256 keyId=svc-a, timestamp=1716307200, signature=7f3a...</span>
+
+<span class="comment"># What gets signed:</span>
+POST\n/api/v2/events\n1716307200\n
+x-content-sha256:abc...\n
+<span class="comment"># → HMAC-SHA256 of this string with the shared secret</span>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Key Facts</div>
+            <div class="fact-group">
+              <h4>Why It's Stronger Than API Keys</h4>
+              <div class="fact-items">
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>The secret never travels on the wire. Only the signature does. Intercepting the request gives you nothing reusable.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Timestamp in the signature prevents replay attacks. Server rejects requests older than N seconds (typically 5 minutes).</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Body is included in the signature. Any tampering with the payload invalidates the signature.</span></div>
+              </div>
+            </div>
+            <div class="fact-group">
+              <h4>Where It's Used</h4>
+              <div class="fact-items">
+                <div class="fact-item info"><span class="fact-icon">→</span><span>AWS Signature V4, Stripe webhook verification, Shopify, GitHub webhooks. Battle-tested pattern.</span></div>
+                <div class="fact-item info"><span class="fact-icon">→</span><span>Correct for service-to-service calls where both sides can share a secret securely via vault.</span></div>
+              </div>
+            </div>
+            <div class="fact-group">
+              <h4>Limitations</h4>
+              <div class="fact-items">
+                <div class="fact-item warn"><span class="fact-icon">!</span><span>Both sides must store the shared secret securely. If the receiver is compromised, the secret is compromised.</span></div>
+                <div class="fact-item warn"><span class="fact-icon">!</span><span>Does not provide non-repudiation — either party could have produced the signature. Use asymmetric signing (RS256/ES256) if you need proof of origin.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box info">
+          <div class="verdict-label">Use Case Verdict</div>
+          <p>HMAC signing is the right choice for M2M API calls where you need request integrity and replay protection without full PKI. Used correctly with vault-stored secrets and short timestamp windows, it's substantially stronger than bare API keys.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Account + mTLS -->
+    <div class="control-card medium" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">03</div>
+          <div class="control-title-group">
+            <h3>Service Accounts + mTLS</h3>
+            <div class="control-subtitle">Certificate-Based Identity · Highest Assurance M2M</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-good">Best Practice</span>
+          <span class="badge badge-ai">AI/Agent</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Service Identity Model</div>
+            <div class="attack-flow">
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">→</div>
+                <div class="step-content">
+                  <div class="step-title">Each service has a certificate</div>
+                  <div class="step-desc">Issued by internal CA. Contains service identity (SPIFFE ID or CN). Short-lived — 24h to 7 days max. Auto-rotated.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">→</div>
+                <div class="step-content">
+                  <div class="step-title">mTLS at the connection layer</div>
+                  <div class="step-desc">Both client and server present certs. TLS handshake validates both. Connection fails if either cert is invalid, expired, or not trusted by the CA.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--muted)">→</div>
+                <div class="step-content">
+                  <div class="step-title">Token binding (optional + recommended)</div>
+                  <div class="step-desc">OAuth token bound to cert thumbprint. Stolen token can't be used without the cert that matches.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Key Facts</div>
+            <div class="fact-group">
+              <h4>AI Agent Context</h4>
+              <div class="fact-items">
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Each agent or MCP server should have its own service identity. Don't share certs across services.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>SPIFFE/SPIRE provides workload identity for containerized agents without manual cert management.</span></div>
+                <div class="fact-item warn"><span class="fact-icon">!</span><span>Operationally expensive. Requires CA, cert issuance pipeline, rotation automation, and revocation (CRL or OCSP).</span></div>
+              </div>
+            </div>
+            <div class="fact-group">
+              <h4>When to Use</h4>
+              <div class="fact-items">
+                <div class="fact-item info"><span class="fact-icon">→</span><span>High-value agent pipelines, regulated data access (PHI, PCI), or anywhere bearer token theft is a credible threat.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box info">
+          <div class="verdict-label">Use Case Verdict</div>
+          <p>mTLS + service accounts is the correct answer for agentic AI pipelines that handle sensitive data or have high blast radius. The operational cost is real — invest in SPIFFE/SPIRE or a service mesh to automate cert lifecycle rather than managing certs manually.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: JWT SECURITY -->
+<!-- ============================================================ -->
+<div id="tab-jwt" class="section">
+  <div class="section-header">
+    <h2>JWT Security</h2>
+    <p>JWTs are used in almost every modern API auth flow. They're also widely misconfigured. These are the real attacks and the specific validation rules that prevent them.</p>
+  </div>
+
+  <div class="controls-grid">
+
+    <div class="control-card critical" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>Algorithm Confusion Attack</h3>
+            <div class="control-subtitle">alg:none / RS256→HS256 Downgrade · Critical</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-critical">Critical</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">How The Attack Works</div>
+            <div class="attack-flow">
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">1</div>
+                <div class="step-content">
+                  <div class="step-title">alg:none attack</div>
+                  <div class="step-desc">Attacker sets the header alg to "none". Vulnerable libraries accept unsigned tokens because they follow the header's algorithm instruction, not a server-enforced allowlist.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">2</div>
+                <div class="step-content">
+                  <div class="step-title">RS256 → HS256 downgrade</div>
+                  <div class="step-desc">Server uses RS256 (asymmetric). Attacker changes header to HS256, signs the token with the server's public key (which is often publicly available). Vulnerable servers verify with the public key as the HMAC secret.</div>
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+<span class="comment"># Vulnerable header</span>
+{ <span class="key">"alg"</span>: <span class="bad">"none"</span>, "typ": "JWT" }
+
+<span class="comment"># Fix: server-side allowlist, never trust header</span>
+<span class="comment"># Python example</span>
+jwt.decode(token, key,
+  <span class="key">algorithms</span>=<span class="val">["RS256"]</span>,  <span class="comment"># explicit allowlist</span>
+  options={<span class="key">"verify_signature"</span>: <span class="val">True</span>}
+)
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Required Controls</div>
+            <div class="fact-group">
+              <div class="fact-items">
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Server must enforce an explicit algorithm allowlist. Never derive the algorithm from the token header.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Reject tokens with alg:none unconditionally. No exceptions.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>If using asymmetric (RS256/ES256), ensure the verification key is the public key and the signing key is the private key. They are not interchangeable.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Prefer ES256 (ECDSA) over RS256 for new implementations. Shorter keys, same security level, harder to misuse.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box critical">
+          <div class="verdict-label">Critical Verdict</div>
+          <p>This class of attack has been exploited in production systems. The fix is two lines of code — an explicit algorithm allowlist and disabled alg:none. There is no excuse for a modern production system to be vulnerable to this.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-card high" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">02</div>
+          <div class="control-title-group">
+            <h3>Missing Claim Validation</h3>
+            <div class="control-subtitle">exp, aud, iss, sub · Authorization Bypass</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-high">High</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Claims You Must Validate</div>
+            <div class="code-block">
+<span class="comment"># Every JWT validation MUST check all of these:</span>
+
+<span class="key">exp</span>  → token not expired (check against current time)
+<span class="key">nbf</span>  → token not used before valid time (if present)
+<span class="key">iss</span>  → issuer matches your expected auth server
+<span class="key">aud</span>  → audience matches YOUR service identifier
+<span class="key">sub</span>  → subject is a valid, active identity
+<span class="key">jti</span>  → token ID not in revocation list (if using revocation)
+
+<span class="comment"># Common mistake: validating signature but not aud</span>
+<span class="comment"># A token issued for Service A is valid for Service B</span>
+<span class="comment"># if Service B doesn't check aud. Token substitution attack.</span>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Key Facts</div>
+            <div class="fact-group">
+              <div class="fact-items">
+                <div class="fact-item bad"><span class="fact-icon">✗</span><span>Signature validation alone is not enough. A token signed by a trusted IdP for a different service is still not valid for your service.</span></div>
+                <div class="fact-item bad"><span class="fact-icon">✗</span><span>Missing exp check means tokens are valid forever. One leak = permanent access.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Validate aud against a hardcoded list of acceptable audience values for your service. Reject anything not on the list.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>Short token lifetimes reduce exposure window. Access tokens: 15 minutes. Refresh tokens: hours to days with rotation.</span></div>
+                <div class="fact-item warn"><span class="fact-icon">!</span><span>AI context: LLM services calling downstream APIs must validate the aud claim. A token issued for the LLM frontend is not valid for the backend data API.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box high">
+          <div class="verdict-label">High Risk Verdict</div>
+          <p>Most JWT libraries validate the signature by default. Most do NOT validate all claims by default. You have to explicitly configure aud, iss, and exp validation. Check your library's defaults — assume they are insufficient.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-card medium" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">03</div>
+          <div class="control-title-group">
+            <h3>JWT Storage and Transport</h3>
+            <div class="control-subtitle">Where You Store It Determines How It Gets Stolen</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-medium">Medium</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Storage Options + Attack Vectors</div>
+            <div class="code-block">
+<span class="bad"># BAD: localStorage — XSS can read it</span>
+localStorage.setItem('token', jwt)
+
+<span class="bad"># BAD: sessionStorage — still XSS-accessible</span>
+sessionStorage.setItem('token', jwt)
+
+<span class="good"># BETTER: HttpOnly cookie — XSS cannot read</span>
+Set-Cookie: token=...; HttpOnly; Secure; SameSite=Strict
+
+<span class="good"># BEST for M2M: in-memory only</span>
+<span class="comment"># Store in a module-scoped variable, never persist</span>
+<span class="comment"># Refresh via client_credentials when expired</span>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Key Facts</div>
+            <div class="fact-group">
+              <div class="fact-items">
+                <div class="fact-item bad"><span class="fact-icon">✗</span><span>localStorage is accessible by any JavaScript on the page. One XSS vulnerability = token theft.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>HttpOnly cookies prevent JavaScript access. Still vulnerable to CSRF — pair with SameSite=Strict and CSRF tokens.</span></div>
+                <div class="fact-item good"><span class="fact-icon">✓</span><span>M2M services should keep tokens in memory only. Fetch a fresh token via client_credentials when the current one expires. Don't persist to disk.</span></div>
+                <div class="fact-item warn"><span class="fact-icon">!</span><span>AI agents running in containers: inject tokens at runtime via secrets mount, not environment variables. Env vars are visible to all processes in the container.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box medium">
+          <div class="verdict-label">Storage Verdict</div>
+          <p>Where you store the token is as important as how you issue it. In-memory for M2M, HttpOnly cookie for browser apps. Never localStorage. The threat model is XSS for browsers and process inspection for services.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: GATEWAY CONTROLS -->
+<!-- ============================================================ -->
+<div id="tab-gateway" class="section">
+  <div class="section-header">
+    <h2>API Gateway Enforcement</h2>
+    <p>Most security controls that live in application code get bypassed when requests hit the service directly. The gateway is the correct enforcement layer for auth, rate limiting, TLS termination, and input validation.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <h3>🏗 What the Gateway Should Own</h3>
+      <div class="fact-items" style="gap:10px">
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>TLS termination and minimum version enforcement (TLS 1.2+ minimum, TLS 1.3 preferred)</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Auth token validation (JWT signature, claims, expiry)</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Rate limiting and throttling per client, per endpoint</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>IP allowlisting for internal services</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Request size limits — prevent payload floods</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>mTLS enforcement for M2M routes</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>API versioning routing and deprecation cutoffs</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Centralized audit logging with request ID correlation</span></div>
+      </div>
+    </div>
+    <div class="col-card">
+      <h3>⚠ Common Gateway Misconfigurations</h3>
+      <div class="fact-items" style="gap:10px">
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>Auth validation in app code only — bypassed when gateway routes to service directly</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>TLS 1.0/1.1 still enabled — scan your gateway cipher suites</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>No request size cap — downstream services get flooded with multi-MB payloads</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>Internal services directly accessible without going through the gateway</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>Different rate limits for prod vs staging — attackers fingerprint and exploit staging</span></div>
+        <div class="fact-item warn"><span class="fact-icon">!</span><span>AI endpoints (LLM inference) not behind the same gateway controls as other APIs</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-grid">
+    <div class="control-card high" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>Gateway Products — Security Comparison</h3>
+            <div class="control-subtitle">Kong, Apigee, AWS API GW, Azure APIM</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-info">Reference</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body" style="padding:0">
+        <table class="matrix-table" style="border-radius:0; border:none; border-top: 1px solid var(--border);">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Kong</th>
+              <th>Apigee</th>
+              <th>AWS API GW</th>
+              <th>Azure APIM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>mTLS enforcement</td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-warn">Partial</span></td><td><span class="dot-yes">✓</span></td></tr>
+            <tr><td>JWT validation</td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td></tr>
+            <tr><td>Rate limiting (per key)</td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td></tr>
+            <tr><td>Request body inspection</td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-warn">Via WAF</span></td><td><span class="dot-warn">Via policy</span></td></tr>
+            <tr><td>DPoP support</td><td><span class="dot-warn">Plugin</span></td><td><span class="dot-warn">Custom</span></td><td><span class="dot-no">✗</span></td><td><span class="dot-no">✗</span></td></tr>
+            <tr><td>AI token usage tracking</td><td><span class="dot-warn">Plugin</span></td><td><span class="dot-warn">Custom</span></td><td><span class="dot-warn">Bedrock only</span></td><td><span class="dot-yes">✓ APIM AI</span></td></tr>
+            <tr><td>Centralized audit log</td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">✓</span></td><td><span class="dot-yes">CloudTrail</span></td><td><span class="dot-yes">✓</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:14px 20px; border-top:1px solid var(--border); font-size:13px; color:var(--muted);">
+          ! Point-in-time snapshot. Vendor features change frequently — verify each cell against current vendor documentation before making a procurement or architecture decision.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: RATE LIMITING -->
+<!-- ============================================================ -->
+<div id="tab-ratelimit" class="section">
+  <div class="section-header">
+    <h2>Rate Limiting and Throttling</h2>
+    <p>Rate limiting is both an availability control and a security control. Without it, a single caller can exhaust your service, enumerate your data, or run brute-force attacks. AI endpoints have additional exposure because inference is expensive and slow.</p>
+  </div>
+
+  <div class="controls-grid">
+    <div class="control-card critical" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>Rate Limit Strategies</h3>
+            <div class="control-subtitle">Fixed Window, Sliding Window, Token Bucket, Leaky Bucket</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-info">Reference</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Strategy Comparison</div>
+            <table class="matrix-table" style="border:none; border-radius:0">
+              <thead><tr><th>Strategy</th><th>Burst Handling</th><th>Use Case</th></tr></thead>
+              <tbody>
+                <tr><td>Fixed Window</td><td><span class="dot-warn">Edge burst</span></td><td>Simple quotas. Easy to implement. Vulnerable to burst at window boundary.</td></tr>
+                <tr><td>Sliding Window</td><td><span class="dot-yes">Good</span></td><td>More accurate than fixed. Good for general API rate limiting.</td></tr>
+                <tr><td>Token Bucket</td><td><span class="dot-yes">Allows burst</span></td><td>Allow controlled burst with long-term average limit. Good for variable-load APIs.</td></tr>
+                <tr><td>Leaky Bucket</td><td><span class="dot-no">No burst</span></td><td>Smooth output rate. Good for protecting slow downstream services.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">What to Rate Limit</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Per API key or client ID — prevent a single caller from monopolizing capacity</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Per IP address — secondary control for unauthenticated endpoints</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Per endpoint — your inference endpoint needs tighter limits than your health check</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Per user (for multi-tenant AI) — prevent one tenant from degrading others</span></div>
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>AI-specific: rate limit on token input/output, not just request count. A single request with a 100K token prompt costs the same as 1000 normal requests.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Return 429 with Retry-After header. Never silently drop requests — callers need to back off correctly.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box info">
+          <div class="verdict-label">AI Endpoint Verdict</div>
+          <p>Standard request-count rate limiting is insufficient for AI inference endpoints. You need token-based limits (input + output tokens per minute) and cost-based limits in addition to request counts. A single adversarial prompt can consume more resources than thousands of normal requests.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: WEBHOOKS -->
+<!-- ============================================================ -->
+<div id="tab-webhook" class="section">
+  <div class="section-header">
+    <h2>Webhook Security</h2>
+    <p>Webhooks reverse the API call direction — a third-party calls your endpoint. That means you have no control over the caller at the network level. Verification happens at the payload level.</p>
+  </div>
+
+  <div class="controls-grid">
+    <div class="control-card high" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>HMAC Payload Verification</h3>
+            <div class="control-subtitle">The Standard Webhook Security Pattern</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-good">Required</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Verification Pattern</div>
+            <div class="code-block">
+<span class="comment"># Sender (e.g., Stripe, GitHub) signs the payload:</span>
+signature = HMAC-SHA256(raw_body, webhook_secret)
+Header: <span class="key">X-Signature-256</span>: <span class="val">sha256={signature}</span>
+
+<span class="comment"># Your receiver MUST:</span>
+<span class="comment"># 1. Read raw body bytes BEFORE parsing JSON</span>
+<span class="comment"># 2. Compute expected signature</span>
+<span class="comment"># 3. Constant-time compare — NEVER string compare</span>
+
+<span class="bad"># WRONG — timing attack vulnerable</span>
+if received_sig == expected_sig:
+
+<span class="good"># RIGHT — constant-time</span>
+if hmac.compare_digest(received_sig, expected_sig):
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Required Controls</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Always verify the signature before processing the payload. Never process first, verify later.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Use constant-time comparison. String equality is vulnerable to timing attacks that reveal the signature byte by byte.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Validate a timestamp in the payload. Reject webhooks older than 5 minutes — prevents replay attacks.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Return 200 immediately, process async. Avoid webhook timeouts that trigger retries and replay edge cases.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Do not trust IP allowlisting alone. Vendor IPs change. Payload verification is the correct control.</span></div>
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>AI context: webhooks from LLM providers (model completion callbacks, fine-tune job completion) must be verified the same way. These can trigger privileged actions.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box high">
+          <div class="verdict-label">Webhook Verdict</div>
+          <p>An unverified webhook endpoint is an unauthenticated HTTP endpoint that can trigger business logic. Payload HMAC verification is the minimum required control. The two most common mistakes are string comparison instead of constant-time comparison, and processing before verifying.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: CORS -->
+<!-- ============================================================ -->
+<div id="tab-cors" class="section">
+  <div class="section-header">
+    <h2>CORS — Cross-Origin Resource Sharing</h2>
+    <p>CORS is a browser-enforced policy. It does not protect your API from non-browser callers. Its purpose is to control which web origins can make cross-origin requests from a browser. Misconfiguration is extremely common and often has high impact.</p>
+  </div>
+
+  <div class="controls-grid">
+    <div class="control-card critical" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>CORS Misconfigurations</h3>
+            <div class="control-subtitle">Origin Reflection, Wildcard + Credentials, Null Origin</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-critical">Critical</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">The Three Critical Misconfigs</div>
+            <div class="code-block">
+<span class="comment"># 1. ORIGIN REFLECTION (Critical)</span>
+<span class="bad">Access-Control-Allow-Origin: [whatever the request sent]</span>
+<span class="comment"># Any origin can make credentialed requests. Complete bypass.</span>
+
+<span class="comment"># 2. WILDCARD + CREDENTIALS (Invalid but dangerous when misconfigured)</span>
+<span class="bad">Access-Control-Allow-Origin: *</span>
+<span class="bad">Access-Control-Allow-Credentials: true</span>
+<span class="comment"># Browsers block this, but some frameworks silently fix it</span>
+<span class="comment"># to reflection, creating vuln #1 accidentally</span>
+
+<span class="comment"># 3. NULL ORIGIN (High)</span>
+<span class="bad">Access-Control-Allow-Origin: null</span>
+<span class="comment"># Sandboxed iframes and local files send Origin: null</span>
+<span class="comment"># Attacker can craft a page that sends null origin</span>
+
+<span class="comment"># CORRECT PATTERN</span>
+<span class="good">Access-Control-Allow-Origin: https://app.yourdomain.com</span>
+<span class="comment"># Explicit allowlist. No reflection. No null. No wildcard + creds.</span>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Required Controls</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Maintain an explicit allowlist of permitted origins. Validate incoming Origin header against the list. Return the matching origin or nothing.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Never reflect the Origin header value directly into Access-Control-Allow-Origin without allowlist validation.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Never allow Origin: null in production. No valid production use case.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>For public read-only APIs with no credentials: wildcard (*) is fine. For any API that sends cookies or uses Authorization headers: explicit origin required.</span></div>
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>CORS does not apply to server-to-server calls or curl. It is browser-only. CORS alone is not an API security control — it is a browser behavior control.</span></div>
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>AI apps served from a CDN calling an LLM backend: make sure the CORS policy allows the exact frontend origin. Wildcard here means any page on the internet can call your LLM endpoint from a user's browser.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box critical">
+          <div class="verdict-label">CORS Verdict</div>
+          <p>Origin reflection is the most dangerous and most common CORS misconfiguration. It effectively disables CORS for credentialed requests. Check your server's CORS library defaults — many frameworks have options that enable reflection by accident. Always use an explicit allowlist.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: AI-SPECIFIC THREATS -->
+<!-- ============================================================ -->
+<div id="tab-ai" class="section">
+  <div class="section-header">
+    <h2>AI-Specific API Threats</h2>
+    <p>Standard API security controls are necessary but not sufficient for AI systems. These threats are specific to APIs that sit in front of or behind LLMs, agents, and ML inference endpoints.</p>
+  </div>
+
+  <div class="controls-grid">
+
+    <div class="control-card critical" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">01</div>
+          <div class="control-title-group">
+            <h3>Prompt Injection via API</h3>
+            <div class="control-subtitle">Indirect Prompt Injection · Agent Hijacking</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-critical">Critical</span>
+          <span class="badge badge-ai">AI-Specific</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Attack Pattern</div>
+            <div class="attack-flow">
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">1</div>
+                <div class="step-content">
+                  <div class="step-title">Direct injection</div>
+                  <div class="step-desc">Attacker sends a crafted API payload containing instructions that override the system prompt. The LLM follows the injected instruction instead of the application's intended behavior.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">2</div>
+                <div class="step-content">
+                  <div class="step-title">Indirect injection</div>
+                  <div class="step-desc">Agent reads external data (email, document, web page) that contains injected instructions. The agent acts on the instructions as if they came from the user. The API call looked clean — the data it fetched was malicious.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--orange)">3</div>
+                <div class="step-content">
+                  <div class="step-title">Exfiltration via output</div>
+                  <div class="step-desc">Injection instructs the LLM to include sensitive data (session tokens, API keys, user PII) in its response, which the application then returns to the attacker via the API response.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Controls</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Treat all external data as untrusted input, including data fetched by the agent. Apply the same sanitization you'd apply to user input.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Separate system prompt from user-controlled input at the API call level. Use structured message formats, not string concatenation.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Output validation: scan LLM responses for sensitive patterns (API key formats, JWT patterns, PII) before returning to caller.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Principle of least privilege for agents: the agent's API credentials should only have access to what it needs for its specific task.</span></div>
+              <div class="fact-item warn"><span class="fact-icon">!</span><span>No complete technical solution exists yet. Layered controls reduce risk. Defense in depth: input sanitization + output filtering + capability scoping + audit logging.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box critical">
+          <div class="verdict-label">AI Threat Verdict</div>
+          <p>Prompt injection is the SQL injection of AI systems. The API layer can implement controls (input sanitization, output filtering, capability scoping) but cannot fully prevent it at the API level alone — the LLM itself has to be part of the defense. Treat it as an ongoing risk to manage, not a problem to solve once.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-card high" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">02</div>
+          <div class="control-title-group">
+            <h3>Model Endpoint Abuse</h3>
+            <div class="control-subtitle">Inference Cost Attacks, Model Extraction, Data Extraction</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-high">High</span>
+          <span class="badge badge-ai">AI-Specific</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Attack Types</div>
+            <div class="attack-flow">
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--red)">$</div>
+                <div class="step-content">
+                  <div class="step-title">Cost exhaustion</div>
+                  <div class="step-desc">Send maximum-token requests at high volume. Inference is expensive. Attacker runs up compute bill or degrades service for other users.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--orange)">⊕</div>
+                <div class="step-content">
+                  <div class="step-title">Model extraction</div>
+                  <div class="step-desc">Systematic querying to reconstruct model behavior, fine-tuning data, or proprietary system prompts. Often done at low rate to avoid rate limiting.</div>
+                </div>
+              </div>
+              <div class="attack-step">
+                <div class="step-icon" style="color:var(--orange)">⊕</div>
+                <div class="step-content">
+                  <div class="step-title">Training data extraction</div>
+                  <div class="step-desc">Specific prompts designed to cause the model to regurgitate training data, potentially including PII or proprietary content.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Controls</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Token-based rate limits per caller. Set max input tokens and max output tokens per request and per time window.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Cost-based quotas per API key. Alert when a key's spend exceeds expected baseline.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Detect systematic enumeration patterns in access logs. Low-volume, high-diversity queries probing the same endpoint are a signal.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>System prompt confidentiality: instruct the model not to reveal its system prompt. Also filter it from responses at the API layer.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box high">
+          <div class="verdict-label">Abuse Verdict</div>
+          <p>AI inference endpoints have a cost dimension that standard APIs don't. Standard request-count rate limiting is insufficient. You need token quotas, cost tracking, and anomaly detection on usage patterns. Treat inference budget management as a security control, not just a cost control.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-card medium" onclick="toggleControl(this)">
+      <div class="control-header">
+        <div class="control-header-left">
+          <div class="control-num">03</div>
+          <div class="control-title-group">
+            <h3>Sensitive Data in LLM Context</h3>
+            <div class="control-subtitle">Data Leakage Through Model Inputs and Outputs</div>
+          </div>
+        </div>
+        <div class="control-header-right">
+          <span class="badge badge-high">High</span>
+          <span class="badge badge-ai">AI-Specific</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="control-body">
+        <div class="control-body-inner">
+          <div class="body-panel">
+            <div class="panel-label">Leakage Vectors</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>API keys and tokens in prompts — LLM providers log inputs. Keys in prompts = keys in vendor logs.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>PII sent to external LLM API without consent or legal basis — GDPR, HIPAA, CCPA violations depending on data type.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Cross-tenant data leakage in multi-user systems — one user's context bleeds into another's response when conversation history is mismanaged.</span></div>
+              <div class="fact-item bad"><span class="fact-icon">✗</span><span>Verbose error responses from the LLM API revealing internal system details, file paths, or data schemas.</span></div>
+            </div>
+          </div>
+          <div class="body-panel">
+            <div class="panel-label">Controls</div>
+            <div class="fact-items" style="gap:10px">
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>PII detection and redaction before sending to external LLM. Use Presidio, AWS Comprehend, or equivalent.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Use private endpoints (Azure OpenAI, AWS Bedrock) for sensitive data — traffic stays within your cloud boundary.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Strict conversation isolation per user session. Never share conversation history or context across users.</span></div>
+              <div class="fact-item good"><span class="fact-icon">✓</span><span>Output scanning for PII and secrets before returning LLM response to caller.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-box medium">
+          <div class="verdict-label">Data Leakage Verdict</div>
+          <p>Every API call to an external LLM is potentially a data transfer to a third party. Apply the same data classification controls you'd apply to any third-party data sharing: classify what's in the prompt, ensure legal basis, use private endpoints for sensitive data, and scan outputs before returning them.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: VERSIONING -->
+<!-- ============================================================ -->
+<div id="tab-versioning" class="section">
+  <div class="section-header">
+    <h2>API Versioning and Deprecation Security</h2>
+    <p>Old API versions left running are a significant and underestimated attack surface. Security fixes applied to v3 often don't get backported to v1 and v2 that are still in production.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <h3>🔴 Why Old Versions Are Dangerous</h3>
+      <div class="fact-items" style="gap:10px">
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>Security patches applied to current version are not applied to deprecated versions</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>Old versions may have weaker auth requirements (no PKCE, no mTLS) that were upgraded in newer versions</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>BOLA/IDOR fixes in current version often leave old endpoints exposed</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>Old versions are often excluded from WAF rules and rate limiting because they're "legacy"</span></div>
+        <div class="fact-item bad"><span class="fact-icon">✗</span><span>AI integrations are especially vulnerable — early AI API integrations were often built against v1 endpoints with weaker controls</span></div>
+      </div>
+    </div>
+    <div class="col-card">
+      <h3>✅ Deprecation Controls</h3>
+      <div class="fact-items" style="gap:10px">
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Maintain an API version inventory. Know which versions are live, who is using them, and what their security posture is.</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Set and enforce sunset dates. Return Deprecation and Sunset headers in every response from deprecated endpoints.</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Apply the same gateway security controls (auth, rate limiting, WAF) to all versions, not just current.</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Force migration deadlines. Hard cutoff with 410 Gone response, not indefinite backwards compatibility.</span></div>
+        <div class="fact-item good"><span class="fact-icon">✓</span><span>Monitor old version usage. Alert on any traffic to sunset endpoints — it's either a migration failure or an attacker who found a soft target.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: CHECKLIST -->
+<!-- ============================================================ -->
+<div id="tab-checklist" class="section">
+  <div class="section-header">
+    <h2>API Security Review Checklist</h2>
+    <p>Use this for design reviews, vendor assessments, and internal API audits. Click each item to mark it complete. Progress is not saved — copy this to your review document.</p>
+  </div>
+
+  <div style="margin-bottom:24px; display:flex; align-items:center; gap:16px;">
+    <div id="progress-text" style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);">0 / 20 complete</div>
+    <div style="flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+      <div id="progress-bar" style="height:100%; width:0%; background:var(--green); transition:width 0.3s; border-radius:2px;"></div>
+    </div>
+    <button onclick="resetChecklist()" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); background:none; border:1px solid var(--border); padding:5px 12px; border-radius:3px; cursor:pointer; letter-spacing:0.08em; text-transform:uppercase;">Reset</button>
+  </div>
+
+  <div class="checklist" id="checklist">
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>API keys never appear in URL query parameters</h4>
+        <p>Header-only transport. Scan logs for api_key= or token= in URL patterns.</p>
+      </div>
+      <span class="badge badge-critical check-badge">Critical</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>All secrets stored in vault, not environment variables or config files</h4>
+        <p>CyberArk, AWS Secrets Manager, HashiCorp Vault. Rotation policy defined.</p>
+      </div>
+      <span class="badge badge-critical check-badge">Critical</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>JWT algorithm explicitly allowlisted server-side</h4>
+        <p>alg:none rejected. RS256 or ES256 enforced. Never trust the token's alg header.</p>
+      </div>
+      <span class="badge badge-critical check-badge">Critical</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>JWT claims fully validated: exp, aud, iss, sub</h4>
+        <p>All four claims checked on every token. aud validated against explicit allowlist.</p>
+      </div>
+      <span class="badge badge-critical check-badge">Critical</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>CORS origin allowlist in place — no reflection, no null origin</h4>
+        <p>Explicit list. No dynamic reflection of Origin header. Null origin blocked.</p>
+      </div>
+      <span class="badge badge-critical check-badge">Critical</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>Webhook payloads verified with HMAC before processing</h4>
+        <p>Constant-time comparison. Timestamp replay window enforced. Verify before acting.</p>
+      </div>
+      <span class="badge badge-high check-badge">High</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>Rate limiting on all endpoints — request count and token volume for AI</h4>
+        <p>Per-client, per-endpoint. AI endpoints also rate limited on input/output token count.</p>
+      </div>
+      <span class="badge badge-high check-badge">High</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>TLS 1.2 minimum enforced at gateway. TLS 1.0/1.1 disabled.</h4>
+        <p>Scan cipher suite config. TLS 1.3 preferred where clients support it.</p>
+      </div>
+      <span class="badge badge-high check-badge">High</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>M2M services use Client Credentials flow, not user-delegated tokens</h4>
+        <p>No shared user accounts for service-to-service calls. Each service has its own identity.</p>
+      </div>
+      <span class="badge badge-high check-badge">High</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>Deprecated API versions have same security controls as current version</h4>
+        <p>Same gateway rules, same WAF, same rate limiting. Sunset date set and enforced.</p>
+      </div>
+      <span class="badge badge-high check-badge">High</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>Access tokens short-lived (15 min or less). Refresh tokens rotated on use.</h4>
+        <p>Long-lived access tokens are compromise multipliers. Minimize exposure window.</p>
+      </div>
+      <span class="badge badge-high check-badge">High</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>API keys scoped to minimum required permissions</h4>
+        <p>Read-only keys cannot write. Per-endpoint scoping where the platform supports it.</p>
+      </div>
+      <span class="badge badge-medium check-badge">Medium</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>Request size limits enforced at gateway</h4>
+        <p>Max request body size. Max URL length. Prevents payload flood and some injection attacks.</p>
+      </div>
+      <span class="badge badge-medium check-badge">Medium</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>All API traffic logged with request ID for correlation</h4>
+        <p>Auth failures, 4xx/5xx rates, usage anomalies. Centralized log aggregation.</p>
+      </div>
+      <span class="badge badge-medium check-badge">Medium</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>Error responses do not expose internal details</h4>
+        <p>No stack traces, file paths, DB errors, or schema info in API error responses.</p>
+      </div>
+      <span class="badge badge-medium check-badge">Medium</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>[AI] LLM API keys not present in prompts or context windows</h4>
+        <p>LLM providers log inputs. Keys in prompts are keys in vendor logs. Use secrets injection at runtime.</p>
+      </div>
+      <span class="badge badge-ai check-badge">AI</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>[AI] PII detected and redacted before sending to external LLM endpoints</h4>
+        <p>Classification-based redaction. Presidio, Comprehend, or equivalent. Logged.</p>
+      </div>
+      <span class="badge badge-ai check-badge">AI</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>[AI] LLM output scanned for sensitive data before returning to caller</h4>
+        <p>PII patterns, API key patterns, JWT patterns. Block or redact before API response.</p>
+      </div>
+      <span class="badge badge-ai check-badge">AI</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>[AI] Agent capabilities scoped to minimum required for its task</h4>
+        <p>Least privilege for agent API credentials. An agent that reads email should not write to the DB.</p>
+      </div>
+      <span class="badge badge-ai check-badge">AI</span>
+    </div>
+    <div class="checklist-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div class="check-content">
+        <h4>[AI] Sensitive data processed via private endpoints, not public LLM APIs</h4>
+        <p>Azure OpenAI private endpoint, AWS Bedrock VPC endpoint, or equivalent. Traffic stays in your cloud boundary.</p>
+      </div>
+      <span class="badge badge-ai check-badge">AI</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+  }
+
+  function toggleControl(card) {
+    if (event.target.closest('.control-body')) return;
+    card.classList.toggle('open');
+  }
+
+  function toggleCheck(item) {
+    item.classList.toggle('checked');
+    const box = item.querySelector('.check-box');
+    if (item.classList.contains('checked')) {
+      box.textContent = '✓';
+    } else {
+      box.textContent = '';
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const total = document.querySelectorAll('.checklist-item').length;
+    const done  = document.querySelectorAll('.checklist-item.checked').length;
+    document.getElementById('progress-text').textContent = done + ' / ' + total + ' complete';
+    document.getElementById('progress-bar').style.width = (done / total * 100) + '%';
+  }
+
+  function resetChecklist() {
+    document.querySelectorAll('.checklist-item').forEach(item => {
+      item.classList.remove('checked');
+      item.querySelector('.check-box').textContent = '';
+    });
+    updateProgress();
+  }
+</script>
+</body>
+</html>
